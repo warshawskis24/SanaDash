@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sana</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<style>
+:root {
+  color-scheme: light;
+  --bg:    #EDE8DF;
+  --card:  #F5F0E8;
+  --card2: #E6E0D6;
+  --green: #13322B;
+  --glt:   #A8D5BE;
+  --gdk:   #4A9170;
+  --ghi:   #2F6E52;
+  --stone: #C0BAB0;
+  --stone2:#A8A298;
+  --taupe: #DDD8CE;
+  --cream: #FDF8F0;
+  --text:  #2A2A2A;
+  --muted: #6A6259;
+  --light: #9A9288;
+  --gold:  #B89860;
+  --teal:  #5A9186;
+  --h0:#D4EDE4; --h1:#94C8B0; --h2:#5AA882; --h3:#2F7A55; --h4:#13322B;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;line-height:1.5;min-height:100vh;}
+
+/* ── Topbar ── */
+.topbar{position:sticky;top:0;z-index:200;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:16px 36px 14px;}
+.wordmark{font-family:Georgia,'Times New Roman',serif;font-size:18px;letter-spacing:.28em;text-transform:uppercase;color:var(--green);}
+.nav-pills{display:flex;gap:6px;}
+.nav-pill{padding:7px 18px;font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--stone2);border-radius:20px;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s;}
+.nav-pill:hover{color:var(--green);border-color:var(--green);}
+.nav-pill.active{background:var(--green);color:var(--cream);border-color:var(--green);}
+
+/* ── Panels ── */
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+.main{padding:20px 36px 16px;max-width:1380px;margin:0 auto;}
+
+/* ── KPI grid ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.kpi-grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px;}
+.kpi{background:var(--card);border-radius:12px;padding:14px 16px;}
+.kpi.primary{background:var(--card2);}
+.kpi-lbl{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--light);margin-bottom:6px;}
+.kpi-val{font-family:Georgia,'Times New Roman',serif;font-size:28px;color:var(--green);line-height:1;margin-bottom:2px;}
+.kpi-val.md{font-size:20px;}
+.kpi-sub{font-size:10px;color:var(--muted);}
+
+/* ── Cards ── */
+.card{background:var(--card);border-radius:14px;padding:20px 22px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;}
+/* Card title — no bold */
+.card-title{font-family:Georgia,'Times New Roman',serif;font-size:28px;color:var(--green);line-height:1.1;font-weight:normal;}
+.card-title.sm{font-size:20px;}
+
+/* ── Standard pill group (FOH sub-nav) ── */
+.pill-grp{display:flex;background:var(--taupe);border-radius:6px;padding:2px;flex-shrink:0;}
+.pill{padding:4px 13px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;background:transparent;color:var(--light);border-radius:4px;transition:all .12s;}
+.pill.active{background:var(--green);color:var(--cream);}
+
+/* ── Underline tab (food metric) ── */
+.utab-grp{display:flex;gap:2px;flex-shrink:0;}
+.utab{padding:4px 10px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:none;border-bottom:2px solid transparent;cursor:pointer;background:transparent;color:var(--light);transition:all .12s;}
+.utab:hover{color:var(--muted);}
+.utab.active{color:var(--green);border-bottom-color:var(--green);}
+
+/* ── Toggle switch ── */
+.sw-label{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;}
+.sw-inp{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+.sw-track{
+  position:relative;width:44px;height:24px;
+  background:var(--stone);border-radius:12px;
+  transition:background .2s;flex-shrink:0;
+}
+.sw-inp:checked + .sw-track{background:var(--gdk);}
+.sw-thumb{
+  position:absolute;top:3px;left:3px;
+  width:18px;height:18px;border-radius:50%;
+  background:white;transition:transform .2s ease;
+  box-shadow:0 1px 3px rgba(0,0,0,.22);
+  display:flex;align-items:center;justify-content:center;
+}
+.sw-inp:checked + .sw-track .sw-thumb{transform:translateX(20px);}
+.sw-check{width:9px;height:7px;color:var(--stone);opacity:0;transition:opacity .15s;}
+.sw-inp:checked + .sw-track .sw-thumb .sw-check{color:var(--gdk);opacity:1;}
+.sw-text{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--light);transition:color .2s;}
+.sw-inp:checked ~ .sw-text{color:var(--gdk);}
+.sw-group{display:flex;align-items:center;gap:18px;flex-shrink:0;}
+
+/* ── Totals summary view ── */
+#totalsWrap{margin-top:8px;}
+.tot-hdr,.tot-row{display:grid;grid-template-columns:56px 1fr 1fr 1fr;gap:8px;align-items:center;}
+.tot-hdr{padding:0 4px 10px;}
+.tot-hdr-cell{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;text-align:center;color:var(--light);}
+.tot-row{padding:6px 4px;}
+.tot-row.week-row{margin-top:10px;}
+.tot-day{font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--muted);}
+.tot-row.week-row .tot-day{color:var(--green);}
+.tot-cell{font-size:14px;font-weight:600;text-align:center;padding:5px 10px;border-radius:8px;}
+/* AM = light blue, PM = light green (old AM), DAY = medium green (old PM) */
+.tot-cell.am   {background:#B8D8F0;color:#2A4A62;}
+.tot-cell.pm   {background:var(--glt);color:var(--green);}
+.tot-cell.total{background:var(--gdk);color:#fff;}
+/* WEEK = one tone darker per column */
+.tot-row.week-row .tot-cell.am   {background:#7AAEC8;color:#fff;}
+.tot-row.week-row .tot-cell.pm   {background:#5AA882;color:#fff;}
+.tot-row.week-row .tot-cell.total{background:var(--ghi);color:#fff;}
+
+/* ── Month dropdown ── */
+.month-sel{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--stone2);border-radius:6px;padding:4px 26px 4px 9px;background:var(--bg);color:var(--muted);cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239A9288' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;}
+.month-sel:focus{outline:none;border-color:var(--green);}
+
+/* ── Day selectors ── */
+.day-sel{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
+.day-btn{padding:4px 10px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--stone2);border-radius:4px;cursor:pointer;background:transparent;color:var(--muted);transition:all .12s;}
+.day-btn.active{background:var(--green);color:var(--cream);border-color:var(--green);}
+
+/* ── Chart wrappers ── */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.cw-sm{position:relative;height:180px;}
+.cw-md{position:relative;height:220px;}
+.cw-lg{position:relative;height:260px;}
+
+/* ── Heatmap ── */
+.hmap-wrap{overflow-x:auto;}
+.hmap-tbl{width:100%;border-collapse:separate;border-spacing:3px;min-width:520px;}
+.hmap-tbl th{font-size:9px;font-weight:700;letter-spacing:.07em;color:var(--light);padding:2px 3px;text-align:center;white-space:nowrap;}
+.hmap-tbl th.rl{text-align:left;width:30px;}
+.hmap-tbl td{padding:0;}
+.hcell{height:30px;min-width:32px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;cursor:default;}
+.hmap-tbl th.gap,.hmap-tbl td.gap{padding-left:25px;}
+.hmap-leg{display:flex;align-items:center;gap:6px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-top:10px;}
+.leg-bar{display:flex;gap:2px;}
+.leg-sw{width:14px;height:8px;border-radius:2px;}
+
+/* ── Totals ── */
+.totals-wrap{display:none;}
+.totals-wrap.vis{display:block;}
+.totals-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.totals-dow{width:32px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--muted);}
+.totals-track{flex:1;height:28px;background:var(--taupe);border-radius:5px;overflow:hidden;display:flex;}
+.totals-am{background:var(--glt);height:100%;min-width:0;transition:width .3s;}
+.totals-pm{background:var(--gdk);height:100%;min-width:0;transition:width .3s;}
+.totals-val{min-width:110px;font-size:10px;color:var(--muted);text-align:right;}
+.totals-legend{display:flex;gap:14px;margin-top:10px;justify-content:flex-end;}
+.totals-leg-item{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+.leg-dot{width:10px;height:10px;border-radius:2px;}
+
+/* ── Calendar nav ── */
+.cal-nav{display:flex;align-items:center;gap:8px;}
+/* smaller nav btn (~75% of before) */
+.cal-nav-btn{background:none;border:1px solid var(--stone2);border-radius:3px;width:20px;height:20px;cursor:pointer;color:var(--green);font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .12s;flex-shrink:0;line-height:1;}
+.cal-nav-btn:hover{background:var(--green);color:var(--cream);}
+.cal-month-lbl{font-family:Georgia,'Times New Roman',serif;font-size:22px;color:var(--green);text-transform:uppercase;letter-spacing:.04em;font-weight:normal;}
+
+/* ── Calendar grid ── */
+.cal-heads{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:4px;}
+.cal-head{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--light);text-align:center;padding:4px 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+/* cell — no border, in-cell overlay on hover */
+.cal-cell{border-radius:10px;min-height:64px;background:var(--cream);position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.cal-cell.empty{background:var(--taupe);opacity:.35;pointer-events:none;}
+.cal-cell.closed{background:var(--taupe);pointer-events:none;}
+.cal-date{font-size:9px;font-weight:600;color:var(--light);position:absolute;top:7px;left:9px;}
+.cal-count{font-family:Georgia,'Times New Roman',serif;font-size:22px;color:var(--green);line-height:1;}
+/* in-cell overlay */
+.cal-ov{position:absolute;inset:0;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:rgba(253,248,225,0.95);opacity:0;transition:opacity .15s;pointer-events:none;z-index:5;}
+.cal-cell:hover .cal-ov{opacity:1;}
+.cal-ov-row{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--green);}
+.cal-ov-lbl{font-size:10px;color:var(--muted);width:22px;}
+.cal-ov-val{font-family:Georgia,serif;font-size:14px;font-weight:600;}
+
+/* ── Badge ── */
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--card2);color:var(--green);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 12px;border-radius:20px;}
+.anomaly{font-size:10px;color:var(--light);margin-top:6px;font-style:italic;}
+
+/* ── Item bars ── */
+.item-bars{margin-top:4px;}
+.item-row{display:flex;align-items:center;gap:0;margin-bottom:5px;}
+.item-lbl{width:160px;font-size:11px;color:var(--muted);text-align:right;padding-right:10px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-bar-wrap{flex:1;}
+.item-bar-track{height:26px;background:var(--taupe);border-radius:0 5px 5px 0;overflow:hidden;}
+.item-bar-fill{height:100%;border-radius:0 5px 5px 0;display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:700;color:#fff;transition:width .4s;}
+
+/* ── Category cards (no border) ── */
+.cat-cards{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.cat-card{border-radius:10px;padding:11px 14px;cursor:pointer;background:var(--cream);transition:all .15s;flex:1;min-width:100px;box-shadow:0 1px 3px rgba(0,0,0,.05);}
+.cat-card:hover{box-shadow:0 0 0 2px var(--gdk);}
+.cat-card.active{background:var(--green);}
+.cat-card.active .cat-lbl,.cat-card.active .cat-val,.cat-card.active .cat-sub{color:var(--cream)!important;}
+.cat-lbl{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--light);margin-bottom:5px;}
+.cat-val{font-family:Georgia,'Times New Roman',serif;font-size:18px;color:var(--green);}
+.cat-sub{font-size:10px;color:var(--muted);margin-top:1px;}
+
+/* ── FOH sub-nav ── */
+.foh-sub-nav{display:flex;background:var(--taupe);border-radius:6px;padding:2px;flex-shrink:0;}
+.foh-sp{padding:4px 13px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;border:none;cursor:pointer;background:transparent;color:var(--light);border-radius:4px;transition:all .12s;display:flex;align-items:center;gap:5px;}
+.foh-sp.active{background:var(--green);color:var(--cream);}
+.foh-section{display:none;}
+.foh-section.vis{display:block;}
+
+/* ── Footer ── */
+.footer{text-align:center;padding:12px 36px 20px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--light);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wordmark">Sana</div>
+  <div class="nav-pills">
+    <button class="nav-pill active" onclick="switchTab('guest',this)">Guests</button>
+    <button class="nav-pill" onclick="switchTab('member',this)">Members</button>
+    <button class="nav-pill" onclick="switchTab('foh',this)">Front of House</button>
+  </div>
+</div>
+
+
+<!-- ════════ GUEST ════════ -->
+<div class="tab-panel active" id="p-guest">
+<div class="main">
+
+  <div class="kpi-grid">
+    <div class="kpi primary"><div class="kpi-lbl">Total Passes Sold</div><div class="kpi-val">2,654</div><div class="kpi-sub">Apr 1 – Jun 21, 2026</div></div>
+    <div class="kpi"><div class="kpi-lbl">Busiest Day</div><div class="kpi-val">Saturday</div><div class="kpi-sub">692 passes total</div></div>
+    <div class="kpi"><div class="kpi-lbl">Peak Hour</div><div class="kpi-val">7 PM</div><div class="kpi-sub">414 passes in slot</div></div>
+    <div class="kpi"><div class="kpi-lbl">Busiest Date</div><div class="kpi-val">May 23</div><div class="kpi-sub">Saturday · 126 passes</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd" style="flex-wrap:wrap;gap:8px;">
+      <!-- Left: title + month dropdown + Totals switch -->
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <div class="card-title" id="hmapTitle">Activity Heatmap</div>
+        <select class="month-sel" id="monthSel" onchange="setHmapMonth(this.value)">
+          <option value="all">All Months</option>
+          <option value="apr">April</option>
+          <option value="may">May</option>
+          <option value="jun" selected>June</option>
+        </select>
+        <label class="sw-label">
+          <input type="checkbox" class="sw-inp" id="totSwitch" onchange="handleTotSwitch(this.checked)">
+          <span class="sw-track"><span class="sw-thumb">
+            <svg class="sw-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></span>
+          <span class="sw-text">Totals</span>
+        </label>
+      </div>
+      <!-- Right: QTY / Revenue switch -->
+      <label class="sw-label">
+        <span class="sw-text" style="color:var(--green)">QTY</span>
+        <input type="checkbox" class="sw-inp" id="revSwitch" onchange="handleRevSwitch(this.checked)">
+        <span class="sw-track"><span class="sw-thumb">
+          <svg class="sw-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span></span>
+        <span class="sw-text">Revenue</span>
+      </label>
+    </div>
+
+    <div id="hmapWrap">
+      <div class="hmap-wrap"><table class="hmap-tbl" id="hmapTbl"></table></div>
+      <div class="hmap-leg">
+        <span>Low</span>
+        <div class="leg-bar">
+          <div class="leg-sw" style="background:var(--h0)"></div><div class="leg-sw" style="background:var(--h1)"></div>
+          <div class="leg-sw" style="background:var(--h2)"></div><div class="leg-sw" style="background:var(--h3)"></div>
+          <div class="leg-sw" style="background:var(--h4)"></div>
+        </div>
+        <span>High</span>
+      </div>
+    </div>
+
+    <div id="totalsWrap" style="display:none;"></div>
+
+  </div>
+
+  <div class="row2">
+    <div class="card">
+      <div class="card-hd"><div class="card-title sm">Passes by Hour</div></div>
+      <div class="day-sel" id="guestDaySel">
+        <button class="day-btn active" onclick="setGuestDay('ALL',this)">All</button>
+        <button class="day-btn" onclick="setGuestDay('TUE',this)">Tue</button>
+        <button class="day-btn" onclick="setGuestDay('WED',this)">Wed</button>
+        <button class="day-btn" onclick="setGuestDay('THU',this)">Thu</button>
+        <button class="day-btn" onclick="setGuestDay('FRI',this)">Fri</button>
+        <button class="day-btn" onclick="setGuestDay('SAT',this)">Sat</button>
+        <button class="day-btn" onclick="setGuestDay('SUN',this)">Sun</button>
+      </div>
+      <div class="cw-md"><canvas id="hourlyChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title sm">Passes by Day</div></div>
+      <div class="cw-md"><canvas id="dailyChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-title sm">Weekly Trend</div>
+      <div class="badge">Avg / week: 221</div>
+    </div>
+    <div class="cw-lg"><canvas id="weeklyChart"></canvas></div>
+    <div class="anomaly">* Week of May 11 anomalously low — possible data gap.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd"><div class="card-title sm">Passes by Month</div></div>
+    <div class="cw-sm"><canvas id="monthlyChart"></canvas></div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ════════ MEMBERS ════════ -->
+<div class="tab-panel" id="p-member">
+<div class="main">
+
+  <div class="kpi-grid">
+    <div class="kpi primary"><div class="kpi-lbl">Active Members</div><div class="kpi-val">52</div><div class="kpi-sub">Founding + Full</div></div>
+    <div class="kpi"><div class="kpi-lbl">Busiest Day</div><div class="kpi-val">Tuesday</div><div class="kpi-sub">Tied with Wed & Sun</div></div>
+    <div class="kpi"><div class="kpi-lbl">Monthly Revenue</div><div class="kpi-val">$11.4k</div><div class="kpi-sub">Recurring</div></div>
+    <div class="kpi"><div class="kpi-lbl">Retention</div><div class="kpi-val">94%</div><div class="kpi-sub">Month-over-month</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd" style="align-items:center;">
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calNav(-1)">&#8249;</button>
+        <div class="cal-month-lbl" id="calMonthLbl"></div>
+        <button class="cal-nav-btn" onclick="calNav(1)">&#8250;</button>
+      </div>
+    </div>
+    <div class="cal-heads">
+      <div class="cal-head">Mon</div><div class="cal-head">Tue</div><div class="cal-head">Wed</div>
+      <div class="cal-head">Thu</div><div class="cal-head">Fri</div><div class="cal-head">Sat</div><div class="cal-head">Sun</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="hmap-leg" style="margin-top:10px;">
+      <span>Low</span>
+      <div class="leg-bar">
+        <div class="leg-sw" style="background:var(--h0)"></div><div class="leg-sw" style="background:var(--h1)"></div>
+        <div class="leg-sw" style="background:var(--h2)"></div><div class="leg-sw" style="background:var(--h3)"></div>
+        <div class="leg-sw" style="background:var(--h4)"></div>
+      </div>
+      <span>High</span>
+    </div>
+  </div>
+
+  <div class="row2">
+    <div class="card">
+      <div class="card-hd"><div class="card-title sm">Visits by Hour</div></div>
+      <div class="day-sel" id="memDaySel">
+        <button class="day-btn active" onclick="setMemDay('ALL',this)">All</button>
+        <button class="day-btn" onclick="setMemDay('TUE',this)">Tue</button>
+        <button class="day-btn" onclick="setMemDay('WED',this)">Wed</button>
+        <button class="day-btn" onclick="setMemDay('THU',this)">Thu</button>
+        <button class="day-btn" onclick="setMemDay('FRI',this)">Fri</button>
+        <button class="day-btn" onclick="setMemDay('SAT',this)">Sat</button>
+        <button class="day-btn" onclick="setMemDay('SUN',this)">Sun</button>
+      </div>
+      <div class="cw-md"><canvas id="memHourlyChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-title sm">Visits by Day</div></div>
+      <div class="cw-md"><canvas id="memDayChart"></canvas></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ════════ FOH ════════ -->
+<div class="tab-panel" id="p-foh">
+<div class="main">
+
+  <div class="kpi-grid-5">
+    <div class="kpi primary"><div class="kpi-lbl">Total Revenue</div><div class="kpi-val md">$11,711</div><div class="kpi-sub">Jun 1–24, 2026</div></div>
+    <div class="kpi"><div class="kpi-lbl">Total Guests</div><div class="kpi-val">250</div><div class="kpi-sub">Covers served</div></div>
+    <div class="kpi"><div class="kpi-lbl">Avg / Guest</div><div class="kpi-val md">$46.84</div><div class="kpi-sub">All categories</div></div>
+    <div class="kpi"><div class="kpi-lbl">Top Food</div><div class="kpi-val md">Plates</div><div class="kpi-sub">$4,199 · 36% of food</div></div>
+    <div class="kpi"><div class="kpi-lbl">Top Drink</div><div class="kpi-val md">Cocktails</div><div class="kpi-sub">$2,059 · 46% of drinks</div></div>
+  </div>
+
+  <div class="card">
+    <!-- Unified card header: title + context controls + sub-nav -->
+    <div class="card-hd" style="align-items:center;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <!-- Calendar arrows (only in cal mode) -->
+        <button class="cal-nav-btn" id="fohPrev" onclick="fohCalNav(-1)">&#8249;</button>
+        <!-- Title -->
+        <div class="card-title" id="fohCardTitle"></div>
+        <!-- Calendar arrows (next) -->
+        <button class="cal-nav-btn" id="fohNext" onclick="fohCalNav(1)">&#8250;</button>
+        <!-- Food metric switch (only in food mode) -->
+        <label class="sw-label" id="fohFoodMetric" style="display:none;margin-left:8px;">
+          <span class="sw-text" style="color:var(--green)">QTY</span>
+          <input type="checkbox" class="sw-inp" id="foodRevSwitch" onchange="setFoodMetric(this.checked?'rev':'qty')">
+          <span class="sw-track"><span class="sw-thumb">
+            <svg class="sw-check" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span></span>
+          <span class="sw-text">Revenue</span>
+        </label>
+      </div>
+      <div class="foh-sub-nav">
+        <button class="foh-sp active" id="fspCal" onclick="switchFoh('cal',this)" title="Calendar">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </button>
+        <button class="foh-sp" id="fspFood" onclick="switchFoh('food',this)">Food</button>
+        <button class="foh-sp" id="fspDrink" onclick="switchFoh('drink',this)">Drink</button>
+      </div>
+    </div>
+
+    <!-- Cal -->
+    <div class="foh-section vis" id="foh-cal">
+      <div class="cal-heads">
+        <div class="cal-head">Mon</div><div class="cal-head">Tue</div><div class="cal-head">Wed</div>
+        <div class="cal-head">Thu</div><div class="cal-head">Fri</div><div class="cal-head">Sat</div><div class="cal-head">Sun</div>
+      </div>
+      <div class="cal-grid" id="fohCalGrid"></div>
+      <div class="hmap-leg" style="margin-top:10px;">
+        <span>Low</span>
+        <div class="leg-bar">
+          <div class="leg-sw" style="background:var(--h0)"></div><div class="leg-sw" style="background:var(--h1)"></div>
+          <div class="leg-sw" style="background:var(--h2)"></div><div class="leg-sw" style="background:var(--h3)"></div>
+          <div class="leg-sw" style="background:var(--h4)"></div>
+        </div>
+        <span>High</span>
+      </div>
+    </div>
+
+    <!-- Food -->
+    <div class="foh-section" id="foh-food">
+      <div class="cat-cards" id="foodCatCards">
+        <div class="cat-card active" onclick="setFoodCat('plates',this)"><div class="cat-lbl">Banya Plates</div><div class="cat-val">$4,199</div><div class="cat-sub">237 sold</div></div>
+        <div class="cat-card" onclick="setFoodCat('boards',this)"><div class="cat-lbl">Banya Boards</div><div class="cat-val">$2,116</div><div class="cat-sub">111 sold</div></div>
+        <div class="cat-card" onclick="setFoodCat('dessert',this)"><div class="cat-lbl">Dessert</div><div class="cat-val">$366</div><div class="cat-sub">38 sold</div></div>
+      </div>
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:10px;" id="foodItemSub"></div>
+      <div class="item-bars" id="foodItemBars"></div>
+      <div style="display:flex;gap:14px;margin-top:12px;">
+        <div class="totals-leg-item"><div class="leg-dot" style="background:var(--ghi)"></div>Plates</div>
+        <div class="totals-leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Boards</div>
+        <div class="totals-leg-item"><div class="leg-dot" style="background:var(--teal)"></div>Dessert</div>
+      </div>
+    </div>
+
+    <!-- Drink -->
+    <div class="foh-section" id="foh-drink">
+      <div class="cat-cards" id="drinkCatCards">
+        <div class="cat-card active" onclick="setDrinkCat('cocktails',this)"><div class="cat-lbl">Cocktails</div><div class="cat-val">$2,059</div><div class="cat-sub">123 sold</div></div>
+        <div class="cat-card" onclick="setDrinkCat('wine',this)"><div class="cat-lbl">Wine</div><div class="cat-val">$1,491</div><div class="cat-sub">94 sold</div></div>
+        <div class="cat-card" onclick="setDrinkCat('nonalc',this)"><div class="cat-lbl">Non-Alc</div><div class="cat-val">$692</div><div class="cat-sub">103 sold</div></div>
+        <div class="cat-card" onclick="setDrinkCat('beer',this)"><div class="cat-lbl">Beer</div><div class="cat-val">$618</div><div class="cat-sub">69 sold</div></div>
+        <div class="cat-card" onclick="setDrinkCat('spirits',this)"><div class="cat-lbl">Spirits</div><div class="cat-val">$89</div><div class="cat-sub">10 sold</div></div>
+      </div>
+      <div style="font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--light);margin-bottom:10px;" id="drinkItemSub"></div>
+      <div class="item-bars" id="drinkItemBars"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="footer">211 Geary Avenue · Toronto · sanasana.ca · Staff Use Only</div>
+
+
+<script>
+/* ══ CONSTANTS ══ */
+const G='#13322B',GDK='#4A9170',GLT='#A8D5BE',GHI='#2F6E52',CR='#FDF8F0',MU='#9A9288';
+const SUN=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;opacity:.7"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.78" y2="4.22"/></svg>`;
+const MOON=`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;opacity:.7"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+/* ══ DATA ══ */
+const HM={
+  all:[[5,12,8,11,16,13,19,23,9,15,20,49,64],[20,2,12,17,20,7,25,24,7,16,31,32,56],[14,1,15,15,22,6,14,24,12,27,31,41,63],[10,5,27,42,33,50,32,34,31,30,43,87,97],[null,null,34,31,67,57,66,87,61,72,74,57,86],[null,null,46,74,75,35,49,84,75,51,48,38,48]],
+  apr:[[0,12,5,4,6,7,12,3,7,6,5,32,21],[6,1,5,7,5,6,9,10,5,8,21,13,22],[5,1,5,5,12,0,4,9,5,12,15,17,33],[4,2,8,14,18,14,11,13,10,12,8,23,26],[null,null,6,9,27,26,20,31,21,38,30,17,36],[null,null,12,30,19,10,15,30,29,14,10,9,20]],
+  may:[[2,0,2,2,4,3,2,9,0,0,7,4,16],[4,1,0,2,8,0,9,1,2,5,4,2,14],[7,0,7,7,0,3,7,1,1,0,8,6,17],[3,0,12,15,7,24,14,10,17,2,28,53,38],[null,null,20,12,21,20,36,42,28,24,37,33,39],[null,null,20,27,33,19,23,40,28,27,32,20,25]],
+  jun:[[3,0,1,5,6,3,5,11,2,9,8,13,27],[10,0,7,8,7,1,7,13,0,3,6,17,20],[2,0,3,3,10,3,3,14,6,15,8,18,13],[3,3,7,13,8,12,7,11,4,16,7,11,33],[null,null,8,10,19,11,10,14,12,10,7,7,11],[null,null,14,17,23,6,11,14,18,10,6,9,3]]
+};
+const HOURS=['7AM','8AM','9AM','10AM','11AM','12PM','1PM','2PM','3PM','4PM','5PM','6PM','7PM'];
+const DAYS=['TUE','WED','THU','FRI','SAT','SUN'];
+const HOURLY=[49,20,142,190,233,168,205,276,195,211,247,304,414];
+const DOW_HOURLY={ALL:[49,20,142,190,233,168,205,276,195,211,247,304,414],TUE:[5,12,8,11,16,13,19,23,9,15,20,49,64],WED:[20,2,12,17,20,7,25,24,7,16,31,32,56],THU:[14,1,15,15,22,6,14,24,12,27,31,41,63],FRI:[10,5,27,42,33,50,32,34,31,30,43,87,97],SAT:[0,0,34,31,67,57,66,87,61,72,74,57,86],SUN:[0,0,46,74,75,35,49,84,75,51,48,38,48]};
+const BY_DAY={labels:['SAT','SUN','FRI','THU','WED','TUE'],values:[692,623,521,285,269,264]};
+const WEEKLY={labels:['Mar 30','Apr 6','Apr 13','Apr 20','Apr 27','May 4','May 11','May 18','May 25','Jun 1','Jun 8','Jun 15'],values:[206,184,263,230,266,252,3,293,282,185,221,269]};
+const MONTHLY={labels:['April','May','June*'],values:[983,996,675]};
+const DOW_TOTALS={labels:['MON','TUE','WED','THU','FRI','SAT','SUN'],am:[6,84,103,87,199,255,279],pm:[30,180,166,198,322,437,344],total:[36,264,269,285,521,692,623]};
+const AVG_PRICE=35;
+
+const DAILY={"2026-04-01":{"total":12,"am":5,"pm":7},"2026-04-02":{"total":27,"am":8,"pm":19},"2026-04-03":{"total":57,"am":28,"pm":29},"2026-04-04":{"total":67,"am":18,"pm":49},"2026-04-05":{"total":43,"am":10,"pm":33},"2026-04-08":{"total":33,"am":6,"pm":27},"2026-04-09":{"total":20,"am":4,"pm":16},"2026-04-10":{"total":42,"am":13,"pm":29},"2026-04-11":{"total":51,"am":11,"pm":40},"2026-04-12":{"total":38,"am":15,"pm":23},"2026-04-14":{"total":50,"am":19,"pm":31},"2026-04-15":{"total":27,"am":13,"pm":14},"2026-04-16":{"total":32,"am":11,"pm":21},"2026-04-17":{"total":26,"am":7,"pm":19},"2026-04-18":{"total":61,"am":21,"pm":40},"2026-04-19":{"total":67,"am":30,"pm":37},"2026-04-21":{"total":26,"am":14,"pm":12},"2026-04-22":{"total":19,"am":5,"pm":14},"2026-04-23":{"total":15,"am":1,"pm":14},"2026-04-24":{"total":38,"am":23,"pm":15},"2026-04-25":{"total":82,"am":38,"pm":44},"2026-04-26":{"total":50,"am":31,"pm":19},"2026-04-28":{"total":44,"am":13,"pm":31},"2026-04-29":{"total":27,"am":10,"pm":17},"2026-04-30":{"total":29,"am":8,"pm":21},"2026-05-01":{"total":52,"am":22,"pm":30},"2026-05-02":{"total":66,"am":29,"pm":37},"2026-05-03":{"total":48,"am":14,"pm":34},"2026-05-05":{"total":18,"am":4,"pm":14},"2026-05-06":{"total":42,"am":17,"pm":25},"2026-05-07":{"total":27,"am":19,"pm":8},"2026-05-08":{"total":51,"am":26,"pm":25},"2026-05-09":{"total":49,"am":19,"pm":30},"2026-05-10":{"total":65,"am":33,"pm":32},"2026-05-16":{"total":3,"am":3,"pm":0},"2026-05-20":{"total":1,"am":0,"pm":1},"2026-05-21":{"total":1,"am":1,"pm":0},"2026-05-22":{"total":63,"am":1,"pm":62},"2026-05-23":{"total":126,"am":41,"pm":85},"2026-05-24":{"total":102,"am":36,"pm":66},"2026-05-26":{"total":33,"am":11,"pm":22},"2026-05-27":{"total":9,"am":7,"pm":2},"2026-05-28":{"total":36,"am":11,"pm":25},"2026-05-29":{"total":57,"am":26,"pm":31},"2026-05-30":{"total":68,"am":17,"pm":51},"2026-05-31":{"total":79,"am":39,"pm":40},"2026-06-02":{"total":37,"am":9,"pm":28},"2026-06-03":{"total":23,"am":12,"pm":11},"2026-06-04":{"total":27,"am":5,"pm":22},"2026-06-05":{"total":31,"am":11,"pm":20},"2026-06-06":{"total":24,"am":10,"pm":14},"2026-06-07":{"total":43,"am":30,"pm":13},"2026-06-09":{"total":25,"am":9,"pm":16},"2026-06-10":{"total":36,"am":17,"pm":19},"2026-06-11":{"total":29,"am":14,"pm":15},"2026-06-12":{"total":46,"am":21,"pm":25},"2026-06-13":{"total":41,"am":27,"pm":14},"2026-06-14":{"total":44,"am":23,"pm":21},"2026-06-16":{"total":31,"am":5,"pm":26},"2026-06-17":{"total":40,"am":11,"pm":29},"2026-06-18":{"total":42,"am":5,"pm":37},"2026-06-19":{"total":58,"am":21,"pm":37},"2026-06-20":{"total":54,"am":21,"pm":33},"2026-06-21":{"total":44,"am":18,"pm":26}};
+
+const FOH_DAILY={"2026-06-02":736,"2026-06-03":615,"2026-06-04":243,"2026-06-05":576,"2026-06-06":329,"2026-06-07":655,"2026-06-09":667,"2026-06-10":31,"2026-06-11":519,"2026-06-12":1023,"2026-06-13":1443,"2026-06-14":833,"2026-06-16":373,"2026-06-17":496,"2026-06-18":658,"2026-06-19":906,"2026-06-20":1374,"2026-06-21":999,"2026-06-23":1003,"2026-06-24":14};
+const FOH_KNOWN={"2026-06-12":{am:220,pm:803},"2026-06-13":{am:310,pm:1133},"2026-06-20":{am:280,pm:1094}};
+function fohSplit(k,t){const s=FOH_KNOWN[k];if(s)return s;const am=Math.round(t*.3);return{am,pm:t-am};}
+
+const FOOD_DATA={
+  plates:{label:'Plates',color:GHI,items:[{n:'Pierogi',q:66,r:528},{n:'Steak Tartare',q:33,r:561},{n:'Cabbage Rolls',q:31,r:248},{n:'Mushroom Schnitzel',q:31,r:403},{n:'Chicken Pie',q:28,r:392},{n:'Old Country Salad',q:23,r:253},{n:'Steelhead Trout',q:15,r:330},{n:'Lunch Soup',q:9,r:108}]},
+  boards:{label:'Boards',color:'#B89860',items:[{n:'Kielbasa Board',q:43,r:559},{n:'Smoked Salmon Board',q:37,r:555},{n:'Pickle Board',q:27,r:270}]},
+  dessert:{label:'Dessert',color:'#5A9186',items:[{n:'Cheesecake',q:33,r:198},{n:'Seasonal Dessert',q:5,r:40}]}
+};
+const DRINK_DATA={
+  cocktails:{label:'Cocktails',items:[{n:'Eastern Martini',q:24},{n:'Verdita Margarita',q:22},{n:'Sana Paloma',q:16},{n:'Espresso Martini',q:13},{n:'Caesar',q:7},{n:'Rum Old Fashioned',q:7},{n:'Martini',q:7},{n:'French 75',q:6},{n:'Negroni',q:4},{n:'Old Fashioned',q:3}]},
+  wine:{label:'Wine',items:[{n:'BTG Normanno White',q:14},{n:'BTG Roku',q:11},{n:'BTG Lambrusco',q:10},{n:'BTG Zardetto',q:10},{n:'BTG Cirelli',q:10},{n:'BTG Parapli',q:9},{n:'BTG Sziegl Pince',q:9},{n:'BTG Normanno Red',q:6},{n:'BTG Piano',q:5}]},
+  nonalc:{label:'Non-Alc',items:[{n:'Matcha Latte',q:28},{n:'Kombucha',q:24},{n:'Herbal Tea',q:19},{n:'Sparkling Water',q:18},{n:'Fresh Juice',q:14}]},
+  beer:{label:'Beer',items:[{n:'Lager',q:22},{n:'IPA',q:18},{n:'Dark Ale',q:15},{n:'Pilsner',q:14}]},
+  spirits:{label:'Spirits',items:[{n:'Whisky',q:5},{n:'Mezcal',q:3},{n:'Gin',q:2}]}
+};
+
+/* ══ HELPERS ══ */
+const NOG={display:false},NOB={display:false},GRID={color:'#D8D2C9'};
+const charts={};
+
+function heatColor(v,max){
+  if(v===null)return null;
+  if(v===0)return{bg:'#E8E4DC',fg:'#B0A898'};
+  const r=v/max;
+  if(r<.12)return{bg:'#D4EDE4',fg:G};
+  if(r<.30)return{bg:'#94C8B0',fg:G};
+  if(r<.55)return{bg:'#5AA882',fg:'#fff'};
+  return{bg:G,fg:CR};
+}
+function calColor(v,max){
+  if(!v)return'#F5F0E8';const r=v/max;
+  if(r<.15)return'#D4EDE4';if(r<.35)return'#7AB8A0';if(r<.60)return'#3D8A67';return GHI;
+}
+function calFg(v,max){return(v/max)>=.35?'#fff':G;}
+function barColors(vals){
+  const max=Math.max(...vals.filter(v=>v!=null));
+  return vals.map(v=>v===max?GHI:GLT);
+}
+
+/* ══ TAB SWITCHING ══ */
+const tabInited={};
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-pill').forEach(b=>b.classList.remove('active'));
+  document.getElementById('p-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(!tabInited[id]){tabInited[id]=true;requestAnimationFrame(()=>requestAnimationFrame(()=>initTabCharts(id)));}
+}
+
+/* ══ HEATMAP ══ */
+let hmMonth='jun', hmMetric='qty', showTotals=false;
+
+function buildHeatmap(){
+  const raw=HM[showTotals?'all':hmMonth];
+  const isRev=hmMetric==='rev';
+  const grid=isRev?raw.map(r=>r.map(v=>v!=null?Math.round(v*AVG_PRICE):null)):raw;
+  const flat=grid.flat().filter(v=>v!=null&&v>0);
+  const max=flat.length?Math.max(...flat):1;
+  let h='<thead><tr><th class="rl"></th>';
+  HOURS.forEach((hr,hi)=>{
+    const gap=hi===9;
+    const icon=hi===0?SUN:(hi===9?MOON:'');
+    h+=`<th${gap?' class="gap"':''}>${icon}${hr}</th>`;
+  });
+  h+='</tr></thead><tbody>';
+  DAYS.forEach((day,di)=>{
+    h+=`<tr><th class="rl">${day}</th>`;
+    HOURS.forEach((_,hi)=>{
+      const v=grid[di][hi];
+      h+=`<td${hi===9?' class="gap"':''}>`;
+      if(v===null){h+='<div class="hcell" style="background:#DEDAD2;"></div>';}
+      else{const c=heatColor(v,max);h+=`<div class="hcell" style="background:${c.bg};color:${c.fg};">${isRev?'$'+v:v}</div>`;}
+      h+='</td>';
+    });
+    h+='</tr>';
+  });
+  document.getElementById('hmapTbl').innerHTML=h+'</tbody>';
+}
+
+function setHmapMonth(m){hmMonth=m;buildHeatmap();}
+
+function handleRevSwitch(on){
+  hmMetric=on?'rev':'qty';
+  if(showTotals) buildTotals(); else buildHeatmap();
+}
+
+function handleTotSwitch(on){
+  showTotals=on;
+  const sel=document.getElementById('monthSel');
+  sel.style.opacity=on?'.4':'1';
+  sel.style.pointerEvents=on?'none':'';
+  document.getElementById('hmapWrap').style.display=on?'none':'';
+  document.getElementById('totalsWrap').style.display=on?'':'none';
+  if(on) buildTotals(); else buildHeatmap();
+}
+
+function buildTotals(){
+  const isRev=hmMetric==='rev';
+  const scale=isRev?AVG_PRICE:1;
+  const fmt=v=>isRev?'$'+(v*scale).toLocaleString():v.toLocaleString();
+  const weekAm=DOW_TOTALS.am.reduce((a,b)=>a+b,0);
+  const weekPm=DOW_TOTALS.pm.reduce((a,b)=>a+b,0);
+  const weekTot=DOW_TOTALS.total.reduce((a,b)=>a+b,0);
+  const header=`<div class="tot-hdr">
+    <div class="tot-hdr-cell"></div>
+    <div class="tot-hdr-cell am">${SUN} AM</div>
+    <div class="tot-hdr-cell pm">${MOON} PM</div>
+    <div class="tot-hdr-cell">Day</div>
+  </div>`;
+  const rows=DOW_TOTALS.labels.map((d,i)=>{
+    if(d==='MON')return'';
+    return`<div class="tot-row">
+      <div class="tot-day">${d}</div>
+      <div class="tot-cell am">${fmt(DOW_TOTALS.am[i])}</div>
+      <div class="tot-cell pm">${fmt(DOW_TOTALS.pm[i])}</div>
+      <div class="tot-cell total">${fmt(DOW_TOTALS.total[i])}</div>
+    </div>`;
+  }).join('');
+  const week=`<div class="tot-row week-row">
+    <div class="tot-day">WEEK</div>
+    <div class="tot-cell am">${fmt(weekAm)}</div>
+    <div class="tot-cell pm">${fmt(weekPm)}</div>
+    <div class="tot-cell total">${fmt(weekTot)}</div>
+  </div>`;
+  document.getElementById('totalsWrap').innerHTML=header+rows+week;
+}
+
+/* ══ GUEST HOURLY ══ */
+function setGuestDay(d,btn){
+  document.querySelectorAll('#guestDaySel .day-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const vals=DOW_HOURLY[d];
+  if(charts.hourly){charts.hourly.data.datasets[0].data=vals;charts.hourly.data.datasets[0].backgroundColor=barColors(vals);charts.hourly.update();}
+}
+
+/* ══ MEMBER CALENDAR ══ */
+// Start on current month
+const _now=new Date();
+let calYear=_now.getFullYear(),calMonth=_now.getMonth();
+
+function buildCalendar(){
+  document.getElementById('calMonthLbl').textContent=MONTHS[calMonth]+' '+calYear;
+  const fd=new Date(calYear,calMonth,1).getDay();
+  const days=new Date(calYear,calMonth+1,0).getDate();
+  const off=(fd===0)?6:fd-1;
+  const vals=[];
+  for(let d=1;d<=days;d++){const k=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;if(DAILY[k])vals.push(DAILY[k].total);}
+  const max=vals.length?Math.max(...vals):1;
+  let h='';
+  for(let i=0;i<off;i++)h+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=days;d++){
+    const k=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dt=new Date(calYear,calMonth,d);const isMon=dt.getDay()===1;const data=DAILY[k];
+    if(isMon){
+      h+=`<div class="cal-cell closed"><div class="cal-date">${d}</div><div style="font-size:9px;color:var(--light);letter-spacing:.08em;margin-top:6px;">CLOSED</div></div>`;
+    }else if(!data){
+      h+=`<div class="cal-cell"><div class="cal-date">${d}</div></div>`;
+    }else{
+      const bg=calColor(data.total,max);const fg=calFg(data.total,max);
+      h+=`<div class="cal-cell" style="background:${bg};">
+        <div class="cal-date" style="color:${fg};opacity:.6">${d}</div>
+        <div class="cal-count" style="color:${fg}">${data.total}</div>
+        <div class="cal-ov">
+          <div class="cal-ov-row">${SUN}<span class="cal-ov-lbl">AM</span><span class="cal-ov-val">${data.am}</span></div>
+          <div class="cal-ov-row">${MOON}<span class="cal-ov-lbl">PM</span><span class="cal-ov-val">${data.pm}</span></div>
+        </div>
+      </div>`;
+    }
+  }
+  const tot=off+days;for(let i=0;i<(7-tot%7)%7;i++)h+='<div class="cal-cell empty"></div>';
+  document.getElementById('calGrid').innerHTML=h;
+}
+function calNav(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}buildCalendar();}
+
+/* ══ MEMBER HOURLY ══ */
+function setMemDay(d,btn){
+  document.querySelectorAll('#memDaySel .day-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const vals=DOW_HOURLY[d];
+  if(charts.memHourly){charts.memHourly.data.datasets[0].data=vals;charts.memHourly.data.datasets[0].backgroundColor=barColors(vals);charts.memHourly.update();}
+}
+
+/* ══ FOH CALENDAR ══ */
+let fohYear=2026,fohMonth=5;
+function buildFohCalendar(){
+  document.getElementById('fohCardTitle').textContent=MONTHS[fohMonth]+' '+fohYear;
+  const fd=new Date(fohYear,fohMonth,1).getDay();
+  const days=new Date(fohYear,fohMonth+1,0).getDate();
+  const off=(fd===0)?6:fd-1;
+  const vals=[];
+  for(let d=1;d<=days;d++){const k=`${fohYear}-${String(fohMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;if(FOH_DAILY[k])vals.push(FOH_DAILY[k]);}
+  const max=vals.length?Math.max(...vals):1;
+  let h='';
+  for(let i=0;i<off;i++)h+='<div class="cal-cell empty"></div>';
+  for(let d=1;d<=days;d++){
+    const k=`${fohYear}-${String(fohMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dt=new Date(fohYear,fohMonth,d);const isMon=dt.getDay()===1;const rev=FOH_DAILY[k];
+    if(isMon){
+      h+=`<div class="cal-cell closed"><div class="cal-date">${d}</div><div style="font-size:9px;color:var(--light);margin-top:6px;">CLOSED</div></div>`;
+    }else if(!rev){
+      h+=`<div class="cal-cell"><div class="cal-date">${d}</div></div>`;
+    }else{
+      const bg=calColor(rev,max);const fg=calFg(rev,max);const sp=fohSplit(k,rev);
+      h+=`<div class="cal-cell" style="background:${bg};">
+        <div class="cal-date" style="color:${fg};opacity:.6">${d}</div>
+        <div class="cal-count" style="color:${fg};font-size:15px">$${rev.toLocaleString()}</div>
+        <div class="cal-ov">
+          <div class="cal-ov-row">${SUN}<span class="cal-ov-lbl">AM</span><span class="cal-ov-val">$${sp.am}</span></div>
+          <div class="cal-ov-row">${MOON}<span class="cal-ov-lbl">PM</span><span class="cal-ov-val">$${sp.pm}</span></div>
+        </div>
+      </div>`;
+    }
+  }
+  const tot=off+days;for(let i=0;i<(7-tot%7)%7;i++)h+='<div class="cal-cell empty"></div>';
+  document.getElementById('fohCalGrid').innerHTML=h;
+}
+function fohCalNav(dir){fohMonth+=dir;if(fohMonth>11){fohMonth=0;fohYear++;}if(fohMonth<0){fohMonth=11;fohYear--;}buildFohCalendar();}
+
+/* ══ FOH NAV ══ */
+let curFohSub='cal';
+function switchFoh(sub,btn){
+  curFohSub=sub;
+  document.querySelectorAll('.foh-sp').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.foh-section').forEach(s=>s.classList.remove('vis'));
+  btn.classList.add('active');
+  document.getElementById('foh-'+sub).classList.add('vis');
+  // Show/hide context controls
+  const isCal=sub==='cal';const isFood=sub==='food';
+  document.getElementById('fohPrev').style.display=isCal?'':'none';
+  document.getElementById('fohNext').style.display=isCal?'':'none';
+  document.getElementById('fohFoodMetric').style.display=isFood?'flex':'none';
+  // Update title
+  if(isCal)document.getElementById('fohCardTitle').textContent=MONTHS[fohMonth]+' '+fohYear;
+  else if(isFood)document.getElementById('fohCardTitle').textContent='Food';
+  else document.getElementById('fohCardTitle').textContent='Drink';
+  // Render content
+  if(isFood)renderFoodBars();
+  if(sub==='drink')renderDrinkBars();
+}
+
+/* ══ FOOD ══ */
+let foodCat='plates',foodMetric='qty';
+function renderFoodBars(){
+  const cat=FOOD_DATA[foodCat];
+  document.getElementById('foodItemSub').textContent=`${cat.label} · Top items by ${foodMetric.toUpperCase()}`;
+  const items=cat.items;const max=Math.max(...items.map(i=>foodMetric==='qty'?i.q:i.r));
+  document.getElementById('foodItemBars').innerHTML=items.map(item=>{
+    const v=foodMetric==='qty'?item.q:item.r;const w=Math.round((v/max)*100);
+    return`<div class="item-row"><div class="item-lbl">${item.n}</div><div class="item-bar-wrap"><div class="item-bar-track"><div class="item-bar-fill" style="width:${w}%;background:${cat.color}">${foodMetric==='qty'?v:'$'+v}</div></div></div></div>`;
+  }).join('');
+}
+function setFoodCat(cat,btn){foodCat=cat;document.querySelectorAll('#foodCatCards .cat-card').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderFoodBars();}
+function setFoodMetric(m){
+  foodMetric=m;
+  renderFoodBars();
+}
+
+/* ══ DRINKS ══ */
+let drinkCat='cocktails';
+function renderDrinkBars(){
+  const cat=DRINK_DATA[drinkCat];
+  document.getElementById('drinkItemSub').textContent=`${cat.label} · Top items by QTY`;
+  const items=cat.items;const max=Math.max(...items.map(i=>i.q));
+  document.getElementById('drinkItemBars').innerHTML=items.map(item=>{
+    const w=Math.round((item.q/max)*100);
+    return`<div class="item-row"><div class="item-lbl">${item.n}</div><div class="item-bar-wrap"><div class="item-bar-track"><div class="item-bar-fill" style="width:${w}%;background:${GDK}">${item.q}</div></div></div></div>`;
+  }).join('');
+}
+function setDrinkCat(cat,btn){drinkCat=cat;document.querySelectorAll('#drinkCatCards .cat-card').forEach(c=>c.classList.remove('active'));btn.classList.add('active');renderDrinkBars();}
+
+/* ══ CHARTS ══ */
+Chart.defaults.font.family="'Helvetica Neue',Arial,sans-serif";
+Chart.defaults.font.size=11;Chart.defaults.color=MU;
+
+function mkBar(id,labels,data,opts={}){
+  const el=document.getElementById(id);if(!el)return null;
+  return new Chart(el,{
+    type:'bar',
+    data:{labels,datasets:[{data,backgroundColor:barColors(data),borderRadius:5,borderSkipped:false,...(opts.ds||{})}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed[opts.horiz?'x':'y']} ${opts.unit||'passes'}`}}},
+      indexAxis:opts.horiz?'y':'x',
+      scales:{x:{grid:opts.horiz?GRID:NOG,border:NOB},y:{grid:opts.horiz?NOG:GRID,border:NOB,ticks:{maxTicksLimit:5}}}
+    }
+  });
+}
+
+function initTabCharts(id){
+  if(id==='guest'){
+    const hl=['7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm'];
+    charts.hourly=mkBar('hourlyChart',hl,HOURLY);
+    charts.daily=mkBar('dailyChart',BY_DAY.labels,BY_DAY.values,{horiz:true,unit:'passes'});
+    charts.weekly=new Chart(document.getElementById('weeklyChart'),{
+      type:'line',
+      data:{labels:WEEKLY.labels,datasets:[
+        {data:WEEKLY.values,borderColor:GHI,backgroundColor:GLT+'33',fill:true,tension:.35,
+         pointBackgroundColor:WEEKLY.values.map(v=>v===3?'#CC3333':GHI),pointBorderColor:CR,pointBorderWidth:2,pointRadius:5,pointHoverRadius:7,borderWidth:2.5},
+        {data:Array(12).fill(221),borderColor:GDK+'88',borderDash:[6,4],borderWidth:1.5,pointRadius:0,fill:false}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.datasetIndex===0?`${c.parsed.y} passes`:'Avg: 221'}}},
+        scales:{x:{grid:NOG,border:NOB},y:{grid:GRID,border:NOB,ticks:{maxTicksLimit:5},min:0}}
+      }
+    });
+    charts.monthly=mkBar('monthlyChart',MONTHLY.labels,MONTHLY.values,{unit:'passes'});
+  }
+  if(id==='member'){
+    buildCalendar();
+    const hl=['7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm'];
+    charts.memHourly=mkBar('memHourlyChart',hl,HOURLY,{unit:'visits'});
+    charts.memDay=mkBar('memDayChart',['TUE','WED','THU','FRI','SAT','SUN'],[264,269,285,521,692,623],{horiz:true,unit:'visits'});
+  }
+  if(id==='foh'){buildFohCalendar();renderFoodBars();renderDrinkBars();}
+}
+
+window.addEventListener('load',()=>{
+  // Init FOH card title state (cal mode, hide food controls)
+  document.getElementById('fohFoodMetric').style.display='none';
+  buildFohCalendar();
+  renderFoodBars();renderDrinkBars();
+  tabInited['guest']=true;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>initTabCharts('guest')));
+  buildHeatmap();
+});
+</script>
+</body>
+</html>
