@@ -481,19 +481,21 @@ const MONTHS=['January','February','March','April','May','June','July','August',
 
 /* ══ DATA ══ */
 const HM={
-  all:[[5,12,8,11,16,13,19,23,9,15,20,49,64],[20,2,12,17,20,7,25,24,7,16,31,32,56],[14,1,15,15,22,6,14,24,12,27,31,41,63],[10,5,27,42,33,50,32,34,31,30,43,87,97],[null,null,34,31,67,57,66,87,61,72,74,57,86],[null,null,46,74,75,35,49,84,75,51,48,38,48]],
+  all:[[5,12,8,11,16,13,19,23,9,15,20,49,64],[20,2,12,17,20,7,25,24,7,16,31,32,56],[14,1,15,15,22,6,14,24,12,27,31,41,63],[10,5,27,42,33,50,32,34,31,30,43,87,97],[null,null,34,31,67,57,66,87,61,72,76,57,86],[null,null,45,70,68,31,46,80,68,44,45,36,45]],
   apr:[[0,12,5,4,6,7,12,3,7,6,5,32,21],[6,1,5,7,5,6,9,10,5,8,21,13,22],[5,1,5,5,12,0,4,9,5,12,15,17,33],[4,2,8,14,18,14,11,13,10,12,8,23,26],[null,null,6,9,27,26,20,31,21,38,30,17,36],[null,null,12,30,19,10,15,30,29,14,10,9,20]],
   may:[[2,0,2,2,4,3,2,9,0,0,7,4,16],[4,1,0,2,8,0,9,1,2,5,4,2,14],[7,0,7,7,0,3,7,1,1,0,8,6,17],[3,0,12,15,7,24,14,10,17,2,28,53,38],[null,null,20,12,21,20,36,42,28,24,37,33,39],[null,null,20,27,33,19,23,40,28,27,32,20,25]],
-  jun:[[3,0,1,5,6,3,5,11,2,9,8,13,27],[10,0,7,8,7,1,7,13,0,3,6,17,20],[2,0,3,3,10,3,3,14,6,15,8,18,13],[3,3,7,13,8,12,7,11,4,16,7,11,33],[null,null,8,10,19,11,10,14,12,10,7,7,11],[null,null,14,17,23,6,11,14,18,10,6,9,3]]
+  jun:[[3,0,1,5,6,3,5,11,2,9,8,13,27],[10,0,7,8,7,1,7,13,0,3,6,17,20],[2,0,3,3,10,3,3,14,6,15,8,18,13],[3,3,7,13,8,12,7,11,4,16,7,11,33],[null,null,8,10,19,11,10,14,12,10,9,7,11],[null,null,13,13,16,2,8,10,11,3,3,7,0]]
 };
 const HOURS=['7AM','8AM','9AM','10AM','11AM','12PM','1PM','2PM','3PM','4PM','5PM','6PM','7PM'];
 const DAYS=['TUE','WED','THU','FRI','SAT','SUN'];
-const HOURLY=[49,20,142,190,233,168,205,276,195,211,247,304,414];
-const DOW_HOURLY={ALL:[49,20,142,190,233,168,205,276,195,211,247,304,414],TUE:[5,12,8,11,16,13,19,23,9,15,20,49,64],WED:[20,2,12,17,20,7,25,24,7,16,31,32,56],THU:[14,1,15,15,22,6,14,24,12,27,31,41,63],FRI:[10,5,27,42,33,50,32,34,31,30,43,87,97],SAT:[0,0,34,31,67,57,66,87,61,72,74,57,86],SUN:[0,0,46,74,75,35,49,84,75,51,48,38,48]};
-const BY_DAY={labels:['SAT','SUN','FRI','THU','WED','TUE'],values:[692,623,521,285,269,264]};
+const HOURLY=[49,20,141,186,226,164,202,272,188,204,246,302,411];
+const DOW_HOURLY={ALL:[49,20,141,186,226,164,202,272,188,204,246,302,411],TUE:[5,12,8,11,16,13,19,23,9,15,20,49,64],WED:[20,2,12,17,20,7,25,24,7,16,31,32,56],THU:[14,1,15,15,22,6,14,24,12,27,31,41,63],FRI:[10,5,27,42,33,50,32,34,31,30,43,87,97],SAT:[0,0,34,31,67,57,66,87,61,72,76,57,86],SUN:[0,0,45,70,68,31,46,80,68,44,45,36,45]};
+const BY_DAY={labels:['SAT','SUN','FRI','THU','WED','TUE'],values:[694,578,521,285,269,264]};
 const WEEKLY={labels:['Mar 30','Apr 6','Apr 13','Apr 20','Apr 27','May 4','May 11','May 18','May 25','Jun 1','Jun 8','Jun 15'],values:[206,184,263,230,266,252,3,293,282,185,221,269]};
-const MONTHLY={labels:['April','May','June*'],values:[983,996,675]};
-const DOW_TOTALS={labels:['TUE','WED','THU','FRI','SAT','SUN'],am:[84,103,87,199,255,279],pm:[180,166,198,322,437,344],total:[264,269,285,521,692,623]};
+const MONTHLY={labels:['April','May','June*'],values:[983,996,632]};
+const DOW_TOTALS={labels:['TUE','WED','THU','FRI','SAT','SUN'],am:[84,103,87,199,255,260],pm:[180,166,198,322,439,318],total:[264,269,285,521,694,578]};
+const MEM_DOW_HOURLY={ALL:[8,0,8,4,12,5,6,11,12,18,13,19,50],TUE:[3,0,1,0,0,1,2,2,2,5,3,0,12],WED:[4,0,2,0,1,1,1,1,1,3,1,5,6],THU:[1,0,1,1,0,0,1,1,2,2,1,3,7],FRI:[0,0,0,1,2,2,0,3,2,0,6,1,11],SAT:[0,0,2,0,2,0,2,2,1,5,2,2,6],SUN:[0,0,2,2,7,1,0,2,4,3,0,8,8]};
+const MEM_BY_DAY=[31,27,20,28,24,37]; // TUE WED THU FRI SAT SUN
 const AVG_PRICE=35;
 
 const DAILY={"2026-04-03":{am:1,pm:0,total:1},"2026-04-04":{am:0,pm:1,total:1},"2026-04-06":{am:1,pm:4,total:5},"2026-04-08":{am:2,pm:1,total:3},"2026-04-10":{am:1,pm:2,total:3},"2026-04-12":{am:0,pm:4,total:4},"2026-04-14":{am:1,pm:3,total:4},"2026-04-15":{am:1,pm:2,total:3},"2026-04-16":{am:0,pm:2,total:2},"2026-04-18":{am:1,pm:1,total:2},"2026-04-19":{am:0,pm:3,total:3},"2026-04-21":{am:0,pm:2,total:2},"2026-04-22":{am:1,pm:3,total:4},"2026-04-23":{am:0,pm:1,total:1},"2026-04-24":{am:1,pm:1,total:2},"2026-04-25":{am:0,pm:2,total:2},"2026-04-26":{am:0,pm:1,total:1},"2026-04-28":{am:1,pm:3,total:4},"2026-04-29":{am:1,pm:3,total:4},"2026-04-30":{am:0,pm:3,total:3},"2026-05-01":{am:0,pm:1,total:1},"2026-05-02":{am:0,pm:2,total:2},"2026-05-03":{am:0,pm:5,total:5},"2026-05-05":{am:0,pm:2,total:2},"2026-05-06":{am:1,pm:4,total:5},"2026-05-08":{am:0,pm:2,total:2},"2026-05-09":{am:2,pm:2,total:4},"2026-05-10":{am:0,pm:2,total:2},"2026-05-22":{am:0,pm:4,total:4},"2026-05-23":{am:0,pm:2,total:2},"2026-05-24":{am:2,pm:3,total:5},"2026-05-26":{am:1,pm:1,total:2},"2026-05-28":{am:0,pm:2,total:2},"2026-05-29":{am:0,pm:3,total:3},"2026-05-30":{am:0,pm:3,total:3},"2026-05-31":{am:1,pm:0,total:1},"2026-06-02":{am:0,pm:4,total:4},"2026-06-03":{am:2,pm:2,total:4},"2026-06-04":{am:1,pm:2,total:3},"2026-06-05":{am:0,pm:4,total:4},"2026-06-06":{am:0,pm:1,total:1},"2026-06-07":{am:2,pm:2,total:4},"2026-06-09":{am:0,pm:3,total:3},"2026-06-10":{am:0,pm:1,total:1},"2026-06-11":{am:3,pm:2,total:5},"2026-06-12":{am:1,pm:2,total:3},"2026-06-13":{am:2,pm:0,total:2},"2026-06-14":{am:6,pm:3,total:9},"2026-06-16":{am:1,pm:6,total:7},"2026-06-17":{am:1,pm:2,total:3},"2026-06-18":{am:0,pm:4,total:4},"2026-06-19":{am:1,pm:4,total:5},"2026-06-20":{am:1,pm:4,total:5},"2026-06-21":{am:1,pm:2,total:3},"2026-06-23":{am:3,pm:0,total:3}};
@@ -578,7 +580,7 @@ function buildHeatmap(){
   document.getElementById('hmapTbl').innerHTML=h+'</tbody>';
 }
 
-function setHmapMonth(m){hmMonth=m;buildHeatmap();}
+function setHmapMonth(m){hmMonth=m;if(showTotals)buildTotals();else buildHeatmap();}
 
 function handleRevSwitch(on){
   hmMetric=on?'rev':'qty';
@@ -587,9 +589,6 @@ function handleRevSwitch(on){
 
 function handleTotSwitch(on){
   showTotals=on;
-  const sel=document.getElementById('monthSel');
-  sel.style.opacity=on?'.4':'1';
-  sel.style.pointerEvents=on?'none':'';
   document.getElementById('hmapWrap').style.display=on?'none':'';
   document.getElementById('totalsWrap').style.display=on?'':'none';
   if(on) buildTotals(); else buildHeatmap();
@@ -599,21 +598,32 @@ function buildTotals(){
   const isRev=hmMetric==='rev';
   const scale=isRev?AVG_PRICE:1;
   const fmt=v=>isRev?'$'+(v*scale).toLocaleString():v.toLocaleString();
-  const weekAm=DOW_TOTALS.am.reduce((a,b)=>a+b,0);
-  const weekPm=DOW_TOTALS.pm.reduce((a,b)=>a+b,0);
-  const weekTot=DOW_TOTALS.total.reduce((a,b)=>a+b,0);
+  // Derive per-month DOW totals from HM data; use precomputed DOW_TOTALS for 'all'
+  let amArr,pmArr,totArr,labels;
+  if(hmMonth==='all'){
+    amArr=DOW_TOTALS.am; pmArr=DOW_TOTALS.pm; totArr=DOW_TOTALS.total; labels=DOW_TOTALS.labels;
+  }else{
+    const data=HM[hmMonth]; // 6 rows × 13 cols (TUE→SUN)
+    amArr=data.map(row=>row.slice(0,7).reduce((a,b)=>a+(b||0),0));
+    pmArr=data.map(row=>row.slice(7).reduce((a,b)=>a+(b||0),0));
+    totArr=amArr.map((a,i)=>a+pmArr[i]);
+    labels=DAYS;
+  }
+  const weekAm=amArr.reduce((a,b)=>a+b,0);
+  const weekPm=pmArr.reduce((a,b)=>a+b,0);
+  const weekTot=totArr.reduce((a,b)=>a+b,0);
   const header=`<div class="tot-hdr">
     <div class="tot-hdr-cell"></div>
     <div class="tot-hdr-cell am">${SUN} AM</div>
     <div class="tot-hdr-cell pm">${MOON} PM</div>
     <div class="tot-hdr-cell">Day</div>
   </div>`;
-  const rows=DOW_TOTALS.labels.map((d,i)=>{
+  const rows=labels.map((d,i)=>{
     return`<div class="tot-row">
       <div class="tot-day">${d}</div>
-      <div class="tot-cell am">${fmt(DOW_TOTALS.am[i])}</div>
-      <div class="tot-cell pm">${fmt(DOW_TOTALS.pm[i])}</div>
-      <div class="tot-cell total">${fmt(DOW_TOTALS.total[i])}</div>
+      <div class="tot-cell am">${fmt(amArr[i])}</div>
+      <div class="tot-cell pm">${fmt(pmArr[i])}</div>
+      <div class="tot-cell total">${fmt(totArr[i])}</div>
     </div>`;
   }).join('');
   const week=`<div class="tot-row week-row">
@@ -676,7 +686,7 @@ function calNav(dir){calMonth+=dir;if(calMonth>11){calMonth=0;calYear++;}if(calM
 function setMemDay(d,btn){
   document.querySelectorAll('#memDaySel .day-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  const vals=DOW_HOURLY[d];
+  const vals=MEM_DOW_HOURLY[d];
   if(charts.memHourly){charts.memHourly.data.datasets[0].data=vals;charts.memHourly.data.datasets[0].backgroundColor=barColors(vals);charts.memHourly.update();}
 }
 
@@ -807,8 +817,8 @@ function initTabCharts(id){
   if(id==='member'){
     buildCalendar();
     const hl=['7am','8am','9am','10am','11am','12pm','1pm','2pm','3pm','4pm','5pm','6pm','7pm'];
-    charts.memHourly=mkBar('memHourlyChart',hl,HOURLY,{unit:'visits'});
-    charts.memDay=mkBar('memDayChart',['TUE','WED','THU','FRI','SAT','SUN'],[264,269,285,521,692,623],{horiz:true,unit:'visits'});
+    charts.memHourly=mkBar('memHourlyChart',hl,MEM_DOW_HOURLY.ALL,{unit:'visits'});
+    charts.memDay=mkBar('memDayChart',['TUE','WED','THU','FRI','SAT','SUN'],MEM_BY_DAY,{horiz:true,unit:'visits'});
   }
   if(id==='foh'){buildFohCalendar();renderFoodBars();renderDrinkBars();}
 }
