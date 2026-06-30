@@ -227,10 +227,10 @@ body{background:var(--bg);color:var(--text);font-family:'Helvetica Neue',Arial,s
 <div class="main">
 
   <div class="kpi-grid">
-    <div class="kpi primary"><div class="kpi-lbl">Total Passes Sold</div><div class="kpi-val">2,654</div><div class="kpi-sub">Apr 1 – Jun 21, 2026</div></div>
-    <div class="kpi"><div class="kpi-lbl">Busiest Day</div><div class="kpi-val">Saturday</div><div class="kpi-sub">692 passes total</div></div>
-    <div class="kpi"><div class="kpi-lbl">Peak Hour</div><div class="kpi-val">7 PM</div><div class="kpi-sub">414 passes in slot</div></div>
-    <div class="kpi"><div class="kpi-lbl">Busiest Date</div><div class="kpi-val">May 23</div><div class="kpi-sub">Saturday · 126 passes</div></div>
+    <div class="kpi primary"><div class="kpi-lbl">Total Passes Sold</div><div class="kpi-val">2,611</div><div class="kpi-sub">Apr 1 – Jun 21, 2026</div></div>
+    <div class="kpi"><div class="kpi-lbl">Gross Revenue</div><div class="kpi-val">$117.7k</div><div class="kpi-sub">Paid passes excl. comps</div></div>
+    <div class="kpi"><div class="kpi-lbl">Busiest Day</div><div class="kpi-val">Saturday</div><div class="kpi-sub">694 passes total</div></div>
+    <div class="kpi"><div class="kpi-lbl">Peak Hour</div><div class="kpi-val">7 PM</div><div class="kpi-sub">411 passes in slot</div></div>
   </div>
 
   <div class="card">
@@ -491,12 +491,12 @@ const DAYS=['TUE','WED','THU','FRI','SAT','SUN'];
 const HOURLY=[49,20,141,186,226,164,202,272,188,204,246,302,411];
 const DOW_HOURLY={ALL:[49,20,141,186,226,164,202,272,188,204,246,302,411],TUE:[5,12,8,11,16,13,19,23,9,15,20,49,64],WED:[20,2,12,17,20,7,25,24,7,16,31,32,56],THU:[14,1,15,15,22,6,14,24,12,27,31,41,63],FRI:[10,5,27,42,33,50,32,34,31,30,43,87,97],SAT:[0,0,34,31,67,57,66,87,61,72,76,57,86],SUN:[0,0,45,70,68,31,46,80,68,44,45,36,45]};
 const BY_DAY={labels:['SAT','SUN','FRI','THU','WED','TUE'],values:[694,578,521,285,269,264]};
-const WEEKLY={labels:['Mar 30','Apr 6','Apr 13','Apr 20','Apr 27','May 4','May 11','May 18','May 25','Jun 1','Jun 8','Jun 15'],values:[206,184,263,230,266,252,3,293,282,185,221,269]};
+const WEEKLY={labels:['Mar 29','Apr 5','Apr 12','Apr 19','Apr 26','May 3','May 10','May 17','May 24','May 31','Jun 7','Jun 14'],values:[163,189,234,247,268,235,68,191,305,223,219,269]};
 const MONTHLY={labels:['April','May','June*'],values:[983,996,632]};
 const DOW_TOTALS={labels:['TUE','WED','THU','FRI','SAT','SUN'],am:[84,103,87,199,255,260],pm:[180,166,198,322,439,318],total:[264,269,285,521,694,578]};
 const MEM_DOW_HOURLY={ALL:[8,0,8,4,12,5,6,11,12,18,13,19,50],TUE:[3,0,1,0,0,1,2,2,2,5,3,0,12],WED:[4,0,2,0,1,1,1,1,1,3,1,5,6],THU:[1,0,1,1,0,0,1,1,2,2,1,3,7],FRI:[0,0,0,1,2,2,0,3,2,0,6,1,11],SAT:[0,0,2,0,2,0,2,2,1,5,2,2,6],SUN:[0,0,2,2,7,1,0,2,4,3,0,8,8]};
 const MEM_BY_DAY=[31,27,20,28,24,37]; // TUE WED THU FRI SAT SUN
-const AVG_PRICE=35;
+const AVG_PRICE=53; // avg gross per paid pass (excl FRIENDS&FAM/staff comps)
 
 const DAILY={"2026-04-03":{am:1,pm:0,total:1},"2026-04-04":{am:0,pm:1,total:1},"2026-04-06":{am:1,pm:4,total:5},"2026-04-08":{am:2,pm:1,total:3},"2026-04-10":{am:1,pm:2,total:3},"2026-04-12":{am:0,pm:4,total:4},"2026-04-14":{am:1,pm:3,total:4},"2026-04-15":{am:1,pm:2,total:3},"2026-04-16":{am:0,pm:2,total:2},"2026-04-18":{am:1,pm:1,total:2},"2026-04-19":{am:0,pm:3,total:3},"2026-04-21":{am:0,pm:2,total:2},"2026-04-22":{am:1,pm:3,total:4},"2026-04-23":{am:0,pm:1,total:1},"2026-04-24":{am:1,pm:1,total:2},"2026-04-25":{am:0,pm:2,total:2},"2026-04-26":{am:0,pm:1,total:1},"2026-04-28":{am:1,pm:3,total:4},"2026-04-29":{am:1,pm:3,total:4},"2026-04-30":{am:0,pm:3,total:3},"2026-05-01":{am:0,pm:1,total:1},"2026-05-02":{am:0,pm:2,total:2},"2026-05-03":{am:0,pm:5,total:5},"2026-05-05":{am:0,pm:2,total:2},"2026-05-06":{am:1,pm:4,total:5},"2026-05-08":{am:0,pm:2,total:2},"2026-05-09":{am:2,pm:2,total:4},"2026-05-10":{am:0,pm:2,total:2},"2026-05-22":{am:0,pm:4,total:4},"2026-05-23":{am:0,pm:2,total:2},"2026-05-24":{am:2,pm:3,total:5},"2026-05-26":{am:1,pm:1,total:2},"2026-05-28":{am:0,pm:2,total:2},"2026-05-29":{am:0,pm:3,total:3},"2026-05-30":{am:0,pm:3,total:3},"2026-05-31":{am:1,pm:0,total:1},"2026-06-02":{am:0,pm:4,total:4},"2026-06-03":{am:2,pm:2,total:4},"2026-06-04":{am:1,pm:2,total:3},"2026-06-05":{am:0,pm:4,total:4},"2026-06-06":{am:0,pm:1,total:1},"2026-06-07":{am:2,pm:2,total:4},"2026-06-09":{am:0,pm:3,total:3},"2026-06-10":{am:0,pm:1,total:1},"2026-06-11":{am:3,pm:2,total:5},"2026-06-12":{am:1,pm:2,total:3},"2026-06-13":{am:2,pm:0,total:2},"2026-06-14":{am:6,pm:3,total:9},"2026-06-16":{am:1,pm:6,total:7},"2026-06-17":{am:1,pm:2,total:3},"2026-06-18":{am:0,pm:4,total:4},"2026-06-19":{am:1,pm:4,total:5},"2026-06-20":{am:1,pm:4,total:5},"2026-06-21":{am:1,pm:2,total:3},"2026-06-23":{am:3,pm:0,total:3}};
 
